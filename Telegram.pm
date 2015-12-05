@@ -1,10 +1,11 @@
 package Telegram;
+
 use strict;
 use warnings FATAL => 'all';
 use vars qw($VERSION);
+
 use LWP::UserAgent;
 use JSON;
-use Data::Dumper;
 
 $VERSION = 0.01;
 
@@ -75,11 +76,233 @@ sub message_send {
     my $self = shift();
     my $to = shift();
     my $text = shift();
+    my $parser_mode = shift();
+    my $disable_web_page_preview = shift();
+    my $reply_to_message_id = shift();
+    my $reply_markup = shift();
     my $message = {
         chat_id => $to,
         text    => $text
     };
+    if ( defined $parser_mode ) {
+        $message->{parser_mode} = $parser_mode;
+    }
+    if ( defined $disable_web_page_preview ) {
+        $message->{disable_web_page_preview} = $disable_web_page_preview;
+    }
+    if ( defined $reply_markup ) {
+        $message->{reply_markup} = $reply_markup;
+    }
+    if ( defined $reply_to_message_id ) {
+        $message->{reply_to_message_id} = $reply_to_message_id;
+    }
     my $response = $self->command_send('sendMessage', $message);
+    return $response;
+}
+
+#@method
+sub message_forward {
+    my $self = shift();
+    my $to = shift();
+    my $from = shift();
+    my $item = shift();
+    my $message = {
+        chat_id         => $to,
+        from_chat_id    => $from,
+        message_id      => $item
+    };
+    my $response = $self->command_send('forwardMessage', $message);
+    return $response;
+}
+
+#@method
+sub photo_send {
+    my $self = shift();
+    my $to = shift();
+    my $photo = shift();
+    my $caption = shift();
+    my $reply_to_message_id = shift();
+    my $reply_markup = shift();
+    my $message = {
+        chart_id    => $to,
+        photo       => [$photo]
+    };
+    if ( defined $caption ) {
+        $message->{caption} = $caption;
+    }
+    if ( defined $reply_markup ) {
+        $message->{reply_markup} = $reply_markup;
+    }
+    if ( defined $reply_to_message_id ) {
+        $message->{reply_to_message_id} = $reply_to_message_id;
+    }
+    my $response = $self->command_send('sendPhoto', $message);
+    return $response;
+}
+
+#@method
+sub audio_send {
+    my $self = shift();
+    my $to = shift();
+    my $audio = shift();
+    my $duration = shift();
+    my $performer = shift();
+    my $title = shift();
+    my $reply_to_message_id = shift();
+    my $reply_markup = shift();
+    my $message = {
+        chart_id    => $to,
+        audio       => [$audio]
+    };
+    if ( defined $duration ) {
+        $message->{duration} = $duration;
+    }
+    if ( defined $performer ) {
+        $message->{performer} = $performer;
+    }
+    if ( defined $title ) {
+        $message->{title} = $title;
+    }
+    if ( defined $reply_markup ) {
+        $message->{reply_markup} = $reply_markup;
+    }
+    if ( defined $reply_to_message_id ) {
+        $message->{reply_to_message_id} = $reply_to_message_id;
+    }
+    my $response = $self->command_send('sendAudio', $message);
+    return $response;
+}
+
+#@method
+sub document_send {
+    my $self = shift();
+    my $to = shift();
+    my $document = shift();
+    my $reply_to_message_id = shift();
+    my $reply_markup = shift();
+    my $message = {
+        chart_id    => $to,
+        document       => [$document]
+    };
+    if ( defined $reply_markup ) {
+        $message->{reply_markup} = $reply_markup;
+    }
+    if ( defined $reply_to_message_id ) {
+        $message->{reply_to_message_id} = $reply_to_message_id;
+    }
+    my $response = $self->command_send('sendDocument', $message);
+    return $response;
+}
+
+#@method
+sub sticker_send {
+    my $self = shift();
+    my $to = shift();
+    my $sticker = shift();
+    my $reply_to_message_id = shift();
+    my $reply_markup = shift();
+    my $message = {
+        chart_id    => $to,
+        sticker       => [$sticker]
+    };
+    if ( defined $reply_markup ) {
+        $message->{reply_markup} = $reply_markup;
+    }
+    if ( defined $reply_to_message_id ) {
+        $message->{reply_to_message_id} = $reply_to_message_id;
+    }
+    my $response = $self->command_send('sendSticker', $message);
+    return $response;
+}
+
+#@method
+sub voice_send {
+    my $self = shift();
+    my $to = shift();
+    my $voice = shift();
+    my $duration = shift();
+    my $reply_to_message_id = shift();
+    my $reply_markup = shift();
+    my $message = {
+        chart_id    => $to,
+        voice       => [$voice]
+    };
+    if ( defined $duration ) {
+        $message->{duration} = $duration;
+    }
+    if ( defined $reply_markup ) {
+        $message->{reply_markup} = $reply_markup;
+    }
+    if ( defined $reply_to_message_id ) {
+        $message->{reply_to_message_id} = $reply_to_message_id;
+    }
+    my $response = $self->command_send('sendVoice', $message);
+    return $response;
+}
+
+#@method
+sub video_send {
+    my $self = shift();
+    my $to = shift();
+    my $video = shift();
+    my $duration = shift();
+    my $caption = shift();
+    my $reply_to_message_id = shift();
+    my $reply_markup = shift();
+    my $message = {
+        chart_id    => $to,
+        video       => [$video]
+    };
+    if ( defined $duration ) {
+        $message->{duration} = $duration;
+    }
+    if ( defined $caption ) {
+        $message->{caption} = $caption;
+    }
+    if ( defined $reply_markup ) {
+        $message->{reply_markup} = $reply_markup;
+    }
+    if ( defined $reply_to_message_id ) {
+        $message->{reply_to_message_id} = $reply_to_message_id;
+    }
+    my $response = $self->command_send('sendVideo', $message);
+    return $response;
+}
+
+#@method
+sub location_send {
+    my $self = shift();
+    my $to = shift();
+    my $latitude = shift();
+    my $longitude = shift();
+    my $reply_to_message_id = shift();
+    my $reply_markup = shift();
+    my $message = {
+        chart_id    => $to,
+        latitude    => $latitude,
+        longitude   => $longitude
+    };
+    if ( defined $reply_markup ) {
+        $message->{reply_markup} = $reply_markup;
+    }
+    if ( defined $reply_to_message_id ) {
+        $message->{reply_to_message_id} = $reply_to_message_id;
+    }
+    my $response = $self->command_send('sendLocation', $message);
+    return $response;
+}
+
+#@method
+sub chat_action_send {
+    my $self = shift();
+    my $to = shift();
+    my $action = shift();
+    my $message = {
+        chart_id    => $to,
+        action      => $action
+    };
+    my $response = $self->command_send('sendChatAction', $message);
+    return $response;
 }
 
 #@method
@@ -109,6 +332,7 @@ sub webhook_set {
         };
     }
     my $resonse = $self->command_send('setWebhook', $request);
+    return $resonse;
 }
 
 1;
