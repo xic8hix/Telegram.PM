@@ -12,15 +12,14 @@ sub new {
     my $class = shift();
     my $token = shift();
     my $callback = shift();
-    my $certificate_file = shift();
+    my $certificate = shift();
     my $self = {
         _version => $VERSION,
         token => $token,
         callback => $callback,
         api_url_base => 'https://api.telegram.org/bot',
         api_url => '',
-        certificate => '',
-        certificate_file => $certificate_file,
+        certificate => $certificate,
         user_agent => 'ICHI/Telegram.pm '.$VERSION.'/ru',
     };
     bless($self,$class);
@@ -31,27 +30,6 @@ sub new {
 #@method
 sub _init {
     my $self = shift();
-    $self->certificate_get();
-}
-
-#@method
-sub certificate_get {
-    my $self = shift();
-    my $file = $self->{certificate_file};
-    my $certificate;
-    my $row;
-    open(my $fh, '<:encoding(UTF-8)', $file);
-    while (<$fh>) {
-        $row = $_;
-        chomp($row);
-        if ( !defined $certificate && $row ne '-----BEGIN CERTIFICATE-----') { last(); }
-        $certificate .= $row;
-    }
-    close($fh);
-    if ($row ne '-----END CERTIFICATE-----') { $certificate = ''; }
-    if ( length($certificate) > 100 ) {
-        $self->{certificate} = $certificate;
-    }
 }
 
 #@method
@@ -99,11 +77,10 @@ sub message_send {
 sub webhook_set {
     my $self = shift();
     my $request;
-    my $certificate = $self->certificate_get();
-    if ($certificate ne '') {
+    if ($self->{certificate} ne '') {
         $request = {
             url         => $self->{callback},
-            certificate => $certificate,
+            certificate => [$self->{certificate}],
         };
     } else {
         $request = {
