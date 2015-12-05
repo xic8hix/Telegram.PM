@@ -4,6 +4,7 @@ use warnings FATAL => 'all';
 use vars qw($VERSION);
 use LWP::UserAgent;
 use JSON;
+use Data::Dumper;
 
 $VERSION = 0.01;
 
@@ -21,6 +22,8 @@ sub new {
         api_url => '',
         certificate => $certificate,
         user_agent => 'ICHI/Telegram.pm '.$VERSION.'/ru',
+        content_type => 'multipart/form-data',
+        me => {},
     };
     bless($self,$class);
     $self->_init();
@@ -30,6 +33,7 @@ sub new {
 #@method
 sub _init {
     my $self = shift();
+    $self->me_get();
 }
 
 #@method
@@ -50,15 +54,20 @@ sub command_send {
     my $self = shift();
     my $command = shift();
     my $content = shift();
-    my $json;
+    my $output;
     my $converter = JSON->new->utf8->allow_nonref;
     my $lwp = LWP::UserAgent->new();
-    $lwp->agent($self->{user_agent});
-    my $result = $lwp->post($self->api_get().$command, $content);
-    if ($result->is_success) {
-        $json = $result->content();
+    $lwp->default_header("User-Agent" => $self->{user_agent} );
+    $lwp->default_header("Content-Type" => $self->{content_type} );
+    my $result = $lwp->post($self->api_get().$command, Content => $content);
+    if ( $result->is_success ) {
+        if ( $result->header('Content-Type') eq 'application/json' ) {
+            $output = $converter->decode($result->content());
+        } else {
+            $output = $result->decoded_content();
+        }
     }
-    return $converter->decode($json);
+    return $output;
 }
 
 #@method
@@ -74,10 +83,22 @@ sub message_send {
 }
 
 #@method
+sub me_get {
+    my $self = shift();
+    if  ( !defined $self->{me}->{id} ) {
+        my $response = $self->command_send('getMe');
+        if ( defined $response->{result} ) {
+            $self->{me} = $response->{result};
+        }
+    }
+    return $self->{me};
+}
+
+#@method
 sub webhook_set {
     my $self = shift();
     my $request;
-    if ($self->{certificate} ne '') {
+    if ( $self->{certificate} ne '' ) {
         $request = {
             url         => $self->{callback},
             certificate => [$self->{certificate}],
