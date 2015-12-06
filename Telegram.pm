@@ -72,30 +72,51 @@ sub command_send {
 }
 
 #@method
+sub message_make {
+    my $self = shift();
+    my $add = shift();
+    my $param = shift();
+    my $rebase = shift();
+    my @base = ("chat_id", "reply_to_message_id", "replay_markup");
+    if ( defined $rebase ) {
+        @base = @$rebase;
+    }
+    my %shorter = (
+        to              => "chat_id",
+        replay_to       => "reply_to_message_id",
+        disable_preview => "disable_web_page_preview"
+    );
+    for (keys %shorter) {
+        if ( defined $param->{$_} ) {
+            $param->{$shorter{$_}} = $param->{$_};
+            delete($param->{$_});
+        }
+    }
+    my @list = (@base, @$add);
+    my %message;
+    for (@list) {
+        if ( defined $param->{$_}) {
+            if ( ref($param->{$_}) eq 'HASH' ) {
+                $message{$_} = [$param->{$_}->{file}];
+            } else {
+                $message{$_} = $param->{$_};
+            }
+        }
+    }
+    return \%message;
+}
+
+
+#@method
 sub message_send {
     my $self = shift();
-    my $to = shift();
-    my $text = shift();
-    my $parser_mode = shift();
-    my $disable_web_page_preview = shift();
-    my $reply_to_message_id = shift();
-    my $reply_markup = shift();
-    my $message = {
-        chat_id => $to,
-        text    => $text
-    };
-    if ( defined $parser_mode ) {
-        $message->{parser_mode} = $parser_mode;
-    }
-    if ( defined $disable_web_page_preview ) {
-        $message->{disable_web_page_preview} = $disable_web_page_preview;
-    }
-    if ( defined $reply_markup ) {
-        $message->{reply_markup} = $reply_markup;
-    }
-    if ( defined $reply_to_message_id ) {
-        $message->{reply_to_message_id} = $reply_to_message_id;
-    }
+    my $param = shift();
+    my $list = ['text', 'parse_mode', 'disable_web_page_preview'];
+    my $message = $self->message_make(
+        $list,
+        $param
+    );
+    return 1;
     my $response = $self->command_send('sendMessage', $message);
     return $response;
 }
@@ -118,24 +139,12 @@ sub message_forward {
 #@method
 sub photo_send {
     my $self = shift();
-    my $to = shift();
-    my $photo = shift();
-    my $caption = shift();
-    my $reply_to_message_id = shift();
-    my $reply_markup = shift();
-    my $message = {
-        chart_id    => $to,
-        photo       => [$photo]
-    };
-    if ( defined $caption ) {
-        $message->{caption} = $caption;
-    }
-    if ( defined $reply_markup ) {
-        $message->{reply_markup} = $reply_markup;
-    }
-    if ( defined $reply_to_message_id ) {
-        $message->{reply_to_message_id} = $reply_to_message_id;
-    }
+    my $param = shift();
+    my $list = ['photo', 'caption'];
+    my $message = $self->message_make(
+        $list,
+        $param
+    );
     my $response = $self->command_send('sendPhoto', $message);
     return $response;
 }
@@ -143,32 +152,12 @@ sub photo_send {
 #@method
 sub audio_send {
     my $self = shift();
-    my $to = shift();
-    my $audio = shift();
-    my $duration = shift();
-    my $performer = shift();
-    my $title = shift();
-    my $reply_to_message_id = shift();
-    my $reply_markup = shift();
-    my $message = {
-        chart_id    => $to,
-        audio       => [$audio]
-    };
-    if ( defined $duration ) {
-        $message->{duration} = $duration;
-    }
-    if ( defined $performer ) {
-        $message->{performer} = $performer;
-    }
-    if ( defined $title ) {
-        $message->{title} = $title;
-    }
-    if ( defined $reply_markup ) {
-        $message->{reply_markup} = $reply_markup;
-    }
-    if ( defined $reply_to_message_id ) {
-        $message->{reply_to_message_id} = $reply_to_message_id;
-    }
+    my $param = shift();
+    my $list = ['audio', 'duration', 'performer', 'title'];
+    my $message = $self->message_make(
+        $list,
+        $param
+    );
     my $response = $self->command_send('sendAudio', $message);
     return $response;
 }
@@ -176,20 +165,13 @@ sub audio_send {
 #@method
 sub document_send {
     my $self = shift();
-    my $to = shift();
-    my $document = shift();
-    my $reply_to_message_id = shift();
-    my $reply_markup = shift();
-    my $message = {
-        chart_id    => $to,
-        document       => [$document]
-    };
-    if ( defined $reply_markup ) {
-        $message->{reply_markup} = $reply_markup;
-    }
-    if ( defined $reply_to_message_id ) {
-        $message->{reply_to_message_id} = $reply_to_message_id;
-    }
+    my $param = shift();
+    my $list = ['document'];
+    my $message = $self->message_make(
+        $list,
+        $param
+    );
+    return 1;
     my $response = $self->command_send('sendDocument', $message);
     return $response;
 }
@@ -197,97 +179,51 @@ sub document_send {
 #@method
 sub sticker_send {
     my $self = shift();
-    my $to = shift();
-    my $sticker = shift();
-    my $reply_to_message_id = shift();
-    my $reply_markup = shift();
-    my $message = {
-        chart_id    => $to,
-        sticker       => [$sticker]
-    };
-    if ( defined $reply_markup ) {
-        $message->{reply_markup} = $reply_markup;
-    }
-    if ( defined $reply_to_message_id ) {
-        $message->{reply_to_message_id} = $reply_to_message_id;
-    }
+    my $param = shift();
+    my $list = ['sticker'];
+    my $message = $self->message_make(
+        $list,
+        $param
+    );
     my $response = $self->command_send('sendSticker', $message);
-    return $response;
-}
-
-#@method
-sub voice_send {
-    my $self = shift();
-    my $to = shift();
-    my $voice = shift();
-    my $duration = shift();
-    my $reply_to_message_id = shift();
-    my $reply_markup = shift();
-    my $message = {
-        chart_id    => $to,
-        voice       => [$voice]
-    };
-    if ( defined $duration ) {
-        $message->{duration} = $duration;
-    }
-    if ( defined $reply_markup ) {
-        $message->{reply_markup} = $reply_markup;
-    }
-    if ( defined $reply_to_message_id ) {
-        $message->{reply_to_message_id} = $reply_to_message_id;
-    }
-    my $response = $self->command_send('sendVoice', $message);
     return $response;
 }
 
 #@method
 sub video_send {
     my $self = shift();
-    my $to = shift();
-    my $video = shift();
-    my $duration = shift();
-    my $caption = shift();
-    my $reply_to_message_id = shift();
-    my $reply_markup = shift();
-    my $message = {
-        chart_id    => $to,
-        video       => [$video]
-    };
-    if ( defined $duration ) {
-        $message->{duration} = $duration;
-    }
-    if ( defined $caption ) {
-        $message->{caption} = $caption;
-    }
-    if ( defined $reply_markup ) {
-        $message->{reply_markup} = $reply_markup;
-    }
-    if ( defined $reply_to_message_id ) {
-        $message->{reply_to_message_id} = $reply_to_message_id;
-    }
+    my $param = shift();
+    my $list = ['video', 'duration', 'caption'];
+    my $message = $self->message_make(
+        $list,
+        $param
+    );
     my $response = $self->command_send('sendVideo', $message);
+    return $response;
+}
+
+#@method
+sub voice_send {
+    my $self = shift();
+    my $param = shift();
+    my $list = ['voice', 'duration'];
+    my $message = $self->message_make(
+        $list,
+        $param
+    );
+    my $response = $self->command_send('sendVoice', $message);
     return $response;
 }
 
 #@method
 sub location_send {
     my $self = shift();
-    my $to = shift();
-    my $latitude = shift();
-    my $longitude = shift();
-    my $reply_to_message_id = shift();
-    my $reply_markup = shift();
-    my $message = {
-        chart_id    => $to,
-        latitude    => $latitude,
-        longitude   => $longitude
-    };
-    if ( defined $reply_markup ) {
-        $message->{reply_markup} = $reply_markup;
-    }
-    if ( defined $reply_to_message_id ) {
-        $message->{reply_to_message_id} = $reply_to_message_id;
-    }
+    my $param = shift();
+    my $list = ['latitude', 'longitude'];
+    my $message = $self->message_make(
+        $list,
+        $param
+    );
     my $response = $self->command_send('sendLocation', $message);
     return $response;
 }
@@ -295,12 +231,14 @@ sub location_send {
 #@method
 sub chat_action_send {
     my $self = shift();
-    my $to = shift();
-    my $action = shift();
-    my $message = {
-        chart_id    => $to,
-        action      => $action
-    };
+    my $param = shift();
+    my $base = ['chat_id'];
+    my $list = ['action'];
+    my $message = $self->message_make(
+        $list,
+        $param,
+        $base
+    );
     my $response = $self->command_send('sendChatAction', $message);
     return $response;
 }
