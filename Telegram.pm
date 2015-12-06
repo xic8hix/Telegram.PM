@@ -2,12 +2,14 @@ package Telegram;
 
 use strict;
 use warnings FATAL => 'all';
-use vars qw($VERSION);
+use vars qw( $VERSION $AUTHOR $AUTHOR_EMAIL );
 
 use LWP::UserAgent;
 use JSON;
 
-$VERSION = 0.01;
+$VERSION = 0.02;
+$AUTHOR = 'Lev ICHI Zaplatin';
+$AUTHOR_EMAIL = 'dev@ichi.su';
 
 #@returns Telegram
 sub new {
@@ -83,6 +85,7 @@ sub message_make {
     }
     my %shorter = (
         to              => "chat_id",
+        from            => "from_chat_id",
         replay_to       => "reply_to_message_id",
         disable_preview => "disable_web_page_preview"
     );
@@ -111,127 +114,190 @@ sub message_make {
 sub message_send {
     my $self = shift();
     my $param = shift();
+    my $callback = shift();
+    my $result;
     my $list = ['text', 'parse_mode', 'disable_web_page_preview'];
     my $message = $self->message_make(
         $list,
         $param
     );
-    return 1;
     my $response = $self->command_send('sendMessage', $message);
-    return $response;
+    if ( defined $callback ) {
+        $result = $callback->($response);
+    } else {
+        $result = $response;
+    }
+    return $result;
 }
 
 #@method
 sub message_forward {
     my $self = shift();
-    my $to = shift();
-    my $from = shift();
-    my $item = shift();
-    my $message = {
-        chat_id         => $to,
-        from_chat_id    => $from,
-        message_id      => $item
-    };
+    my $param = shift();
+    my $callback = shift();
+    my $result;
+    my $base = ['chat_id'];
+    my $list = ['from_chat_id', 'message_id'];
+    my $message = $self->message_make(
+        $list,
+        $param,
+        $base
+    );
     my $response = $self->command_send('forwardMessage', $message);
-    return $response;
+    if ( defined $callback ) {
+        $result = $callback->($response);
+    } else {
+        $result = $response;
+    }
+    return $result;
 }
 
 #@method
 sub photo_send {
     my $self = shift();
     my $param = shift();
+    my $callback = shift();
+    my $result;
     my $list = ['photo', 'caption'];
     my $message = $self->message_make(
         $list,
         $param
     );
     my $response = $self->command_send('sendPhoto', $message);
-    return $response;
+    if ( defined $callback ) {
+        $result = $callback->($response);
+    } else {
+        $result = $response;
+    }
+    return $result;
 }
 
 #@method
 sub audio_send {
     my $self = shift();
     my $param = shift();
+    my $callback = shift();
+    my $result;
     my $list = ['audio', 'duration', 'performer', 'title'];
     my $message = $self->message_make(
         $list,
         $param
     );
     my $response = $self->command_send('sendAudio', $message);
-    return $response;
+    if ( defined $callback ) {
+        $result = $callback->($response);
+    } else {
+        $result = $response;
+    }
+    return $result;
 }
 
 #@method
 sub document_send {
     my $self = shift();
     my $param = shift();
+    my $callback = shift();
+    my $result;
     my $list = ['document'];
     my $message = $self->message_make(
         $list,
         $param
     );
-    return 1;
     my $response = $self->command_send('sendDocument', $message);
-    return $response;
+    if ( defined $callback ) {
+        $result = $callback->($response);
+    } else {
+        $result = $response;
+    }
+    return $result;
 }
 
 #@method
 sub sticker_send {
     my $self = shift();
     my $param = shift();
+    my $callback = shift();
+    my $result;
     my $list = ['sticker'];
     my $message = $self->message_make(
         $list,
         $param
     );
     my $response = $self->command_send('sendSticker', $message);
-    return $response;
+    if ( defined $callback ) {
+        $result = $callback->($response);
+    } else {
+        $result = $response;
+    }
+    return $result;
 }
 
 #@method
 sub video_send {
     my $self = shift();
     my $param = shift();
+    my $callback = shift();
+    my $result;
     my $list = ['video', 'duration', 'caption'];
     my $message = $self->message_make(
         $list,
         $param
     );
     my $response = $self->command_send('sendVideo', $message);
-    return $response;
+    if ( defined $callback ) {
+        $result = $callback->($response);
+    } else {
+        $result = $response;
+    }
+    return $result;
 }
 
 #@method
 sub voice_send {
     my $self = shift();
     my $param = shift();
+    my $callback = shift();
+    my $result;
     my $list = ['voice', 'duration'];
     my $message = $self->message_make(
         $list,
         $param
     );
     my $response = $self->command_send('sendVoice', $message);
-    return $response;
+    if ( defined $callback ) {
+        $result = $callback->($response);
+    } else {
+        $result = $response;
+    }
+    return $result;
 }
 
 #@method
 sub location_send {
     my $self = shift();
     my $param = shift();
+    my $callback = shift();
+    my $result;
     my $list = ['latitude', 'longitude'];
     my $message = $self->message_make(
         $list,
         $param
     );
     my $response = $self->command_send('sendLocation', $message);
-    return $response;
+    if ( defined $callback ) {
+        $result = $callback->($response);
+    } else {
+        $result = $response;
+    }
+    return $result;
 }
 
 #@method
 sub chat_action_send {
     my $self = shift();
     my $param = shift();
+    my $callback = shift();
+    my $result;
     my $base = ['chat_id'];
     my $list = ['action'];
     my $message = $self->message_make(
@@ -240,7 +306,12 @@ sub chat_action_send {
         $base
     );
     my $response = $self->command_send('sendChatAction', $message);
-    return $response;
+    if ( defined $callback ) {
+        $result = $callback->($response);
+    } else {
+        $result = $response;
+    }
+    return $result;
 }
 
 #@method
