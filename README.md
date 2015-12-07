@@ -1,7 +1,16 @@
 # Telegram.PM
 
-Perl package for Telegra Bot API with local(hash,file,SQLite) and external(PostgreSQL, MariaDB) storage
+Perl package for Telegram Bot API with local and external storages.
 
-Todo:
+Local storage:
+* Perl Hash;
+* File;
+* SQLite.
+
+External storage:
+* PostgreSQL;
+* MariaDB/MySQL.
+
+TODO:
 - support memcached;
 - test coverage.
