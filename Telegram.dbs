@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="Telegram" id="Project_38ebdf50" html="y" template="Default" database="PostgreSQL" >
+	<schema name="telegram" schemaname="telegram" >
+		<table name="chat" >
+			<column name="id" type="integer" jt="4" mandatory="y" />
+			<column name="type" type="integer" jt="4" mandatory="y" />
+			<column name="title" type="text" jt="12" />
+			<column name="username" type="integer" length="100" jt="4" />
+			<index name="pk_chat" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="idx_chat" unique="NORMAL" >
+				<column name="type" />
+			</index>
+			<index name="idx_chat" unique="NORMAL" >
+				<column name="username" />
+			</index>
+			<fk name="fk_chat_chat_type" to_schema="telegram" to_table="chat_type" >
+				<fk_column name="type" pk="id" />
+			</fk>
+			<fk name="fk_chat_user" to_schema="telegram" to_table="user" >
+				<fk_column name="username" pk="id" />
+			</fk>
+		</table>
+		<table name="chat_type" >
+			<comment><![CDATA[Типы чатов]]></comment>
+			<column name="id" type="serial" jt="4" mandatory="y" />
+			<column name="name" type="varchar" length="10" jt="12" mandatory="y" />
+			<index name="pk_chat_type" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+		</table>
+		<table name="contact" >
+			<column name="id" type="serial" jt="4" mandatory="y" />
+			<column name="phone_number" type="text" jt="12" mandatory="y" />
+			<column name="first_name" type="text" length="100" jt="12" mandatory="y" />
+			<column name="last_name" type="text" length="100" jt="12" />
+			<column name="user_id" type="integer" jt="4" />
+			<index name="pk_contact" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="idx_contact" unique="NORMAL" >
+				<column name="user_id" />
+			</index>
+			<fk name="fk_contact_user" to_schema="telegram" to_table="user" >
+				<fk_column name="user_id" pk="id" />
+			</fk>
+		</table>
+		<table name="message" >
+			<column name="id" type="integer" jt="4" mandatory="y" />
+			<column name="from_user" type="integer" jt="4" />
+			<column name="date" type="integer" jt="4" mandatory="y" />
+			<column name="chat" type="integer" jt="4" mandatory="y" />
+			<column name="forward_from_user" type="integer" jt="4" />
+			<column name="forward_date" type="integer" jt="4" />
+			<column name="reply_to_message" type="integer" jt="4" />
+			<column name="object" type="integer" jt="4" mandatory="y" />
+			<column name="new_chat_participant" type="integer" jt="4" />
+			<column name="left_chat_participant" type="integer" jt="4" />
+			<column name="new_chat_title" type="text" jt="12" />
+			<column name="new_chat_photo" type="integer" jt="4" />
+			<column name="delete_chat_photo" type="bool" jt="-7" />
+			<column name="group_chat_created" type="bool" jt="-7" />
+			<column name="supergroup_chat_created" type="bool" jt="-7" />
+			<column name="channel_chat_created" type="bool" jt="-7" />
+			<column name="migrate_to_chat_id" type="integer" jt="4" />
+			<column name="migrate_from_chat_id" type="integer" jt="4" />
+			<index name="pk_message" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="idx_message" unique="NORMAL" >
+				<column name="from_user" />
+			</index>
+			<index name="idx_message" unique="NORMAL" >
+				<column name="chat" />
+			</index>
+			<index name="idx_message" unique="NORMAL" >
+				<column name="forward_from_user" />
+			</index>
+			<index name="idx_message" unique="NORMAL" >
+				<column name="reply_to_message" />
+			</index>
+			<index name="idx_message" unique="NORMAL" >
+				<column name="object" />
+			</index>
+			<index name="idx_message" unique="NORMAL" >
+				<column name="new_chat_participant" />
+			</index>
+			<index name="idx_message" unique="NORMAL" >
+				<column name="left_chat_participant" />
+			</index>
+			<index name="idx_message" unique="NORMAL" >
+				<column name="migrate_to_chat_id" />
+			</index>
+			<index name="idx_message" unique="NORMAL" >
+				<column name="migrate_from_chat_id" />
+			</index>
+			<index name="idx_message" unique="NORMAL" >
+				<column name="new_chat_photo" />
+			</index>
+			<fk name="fk_message_user" to_schema="telegram" to_table="user" >
+				<fk_column name="from_user" pk="id" />
+			</fk>
+			<fk name="fk_message_chat" to_schema="telegram" to_table="chat" >
+				<fk_column name="chat" pk="id" />
+			</fk>
+			<fk name="fk_message_forward_user" to_schema="telegram" to_table="user" >
+				<fk_column name="forward_from_user" pk="id" />
+			</fk>
+			<fk name="fk_message_message" to_schema="telegram" to_table="message" >
+				<fk_column name="reply_to_message" pk="id" />
+			</fk>
+			<fk name="fk_message_object" to_schema="telegram" to_table="object" >
+				<fk_column name="object" pk="id" />
+			</fk>
+			<fk name="fk_message_add_user" to_schema="telegram" to_table="user" >
+				<fk_column name="new_chat_participant" pk="id" />
+			</fk>
+			<fk name="fk_message_left_user" to_schema="telegram" to_table="user" >
+				<fk_column name="left_chat_participant" pk="id" />
+			</fk>
+			<fk name="fk_message_migrate_to_chat" to_schema="telegram" to_table="chat" >
+				<fk_column name="migrate_to_chat_id" pk="id" />
+			</fk>
+			<fk name="fk_message_migrate_from_chat" to_schema="telegram" to_table="chat" >
+				<fk_column name="migrate_from_chat_id" pk="id" />
+			</fk>
+			<fk name="fk_message_chat_photo_object" to_schema="telegram" to_table="object" >
+				<fk_column name="new_chat_photo" pk="id" />
+			</fk>
+		</table>
+		<table name="object" >
+			<column name="id" type="serial" jt="4" mandatory="y" />
+			<column name="type" type="integer" jt="4" mandatory="y" />
+			<index name="pk_object" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="idx_object" unique="NORMAL" >
+				<column name="type" />
+			</index>
+			<fk name="fk_object_object_type" to_schema="telegram" to_table="object_type" >
+				<fk_column name="type" pk="id" />
+			</fk>
+		</table>
+		<table name="object_audio" >
+			<column name="id" type="integer" jt="4" mandatory="y" />
+			<column name="audio" type="text" jt="12" mandatory="y" />
+			<column name="duration" type="integer" jt="4" />
+			<column name="performer" type="text" jt="12" />
+			<column name="title" type="text" jt="12" />
+			<column name="mime_type" type="text" jt="12" />
+			<column name="file_size" type="integer" jt="4" />
+			<column name="file" type="text" jt="12" />
+			<index name="pk_object_audio" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<fk name="fk_object_audio_object" to_schema="telegram" to_table="object" >
+				<fk_column name="id" pk="id" />
+			</fk>
+		</table>
+		<table name="object_document" >
+			<column name="id" type="integer" jt="4" mandatory="y" />
+			<column name="document" type="integer" jt="4" mandatory="y" />
+			<column name="thumbnail" type="integer" jt="4" />
+			<column name="file_name" type="text" length="100" jt="12" />
+			<column name="mime_type" type="text" jt="12" />
+			<column name="file_size" type="integer" jt="4" />
+			<column name="file" type="text" jt="12" />
+			<index name="pk_object_document" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="idx_object_document" unique="NORMAL" >
+				<column name="thumbnail" />
+			</index>
+			<fk name="fk_object_document_object" to_schema="telegram" to_table="object" >
+				<fk_column name="id" pk="id" />
+			</fk>
+			<fk name="fk_object_document_thumbnail" to_schema="telegram" to_table="object_photo" >
+				<fk_column name="thumbnail" pk="id" />
+			</fk>
+		</table>
+		<table name="object_photo" >
+			<column name="id" type="serial" jt="4" mandatory="y" />
+			<column name="object" type="integer" jt="4" mandatory="y" />
+			<column name="photo" type="text" jt="12" mandatory="y" />
+			<column name="width" type="integer" jt="4" mandatory="y" />
+			<column name="height" type="integer" jt="4" mandatory="y" />
+			<column name="file_size" type="integer" jt="4" />
+			<column name="file" type="text" jt="12" />
+			<index name="pk_object_thumbnail" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="idx_thumbnail" unique="NORMAL" >
+				<column name="object" />
+			</index>
+			<fk name="fk_thumbnail_object" to_schema="telegram" to_table="object" >
+				<fk_column name="object" pk="id" />
+			</fk>
+		</table>
+		<table name="object_sticker" >
+			<column name="id" type="integer" jt="4" mandatory="y" />
+			<column name="sticker" type="text" jt="12" mandatory="y" />
+			<column name="width" type="integer" jt="4" mandatory="y" />
+			<column name="height" type="integer" jt="4" mandatory="y" />
+			<column name="thumbnail" type="integer" jt="4" />
+			<column name="file_size" type="integer" jt="4" />
+			<column name="file" type="text" jt="12" />
+			<index name="pk_object_sticker" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="idx_object_sticker" unique="NORMAL" >
+				<column name="thumbnail" />
+			</index>
+			<fk name="fk_object_sticker_object" to_schema="telegram" to_table="object" >
+				<fk_column name="id" pk="id" />
+			</fk>
+			<fk name="fk_object_sticker_thumbnail" to_schema="telegram" to_table="object_photo" >
+				<fk_column name="thumbnail" pk="id" />
+			</fk>
+		</table>
+		<table name="object_text" >
+			<column name="id" type="integer" jt="4" mandatory="y" />
+			<column name="text" type="text" length="250" jt="12" mandatory="y" />
+			<index name="pk_object_text" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<fk name="fk_object_text_object" to_schema="telegram" to_table="object" >
+				<fk_column name="id" pk="id" />
+			</fk>
+		</table>
+		<table name="object_type" >
+			<column name="id" type="serial" jt="4" mandatory="y" />
+			<column name="name" type="varchar" length="100" jt="12" mandatory="y" />
+			<index name="pk_object_type" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+		</table>
+		<table name="object_video" >
+			<column name="id" type="integer" jt="4" mandatory="y" />
+			<column name="video" type="text" jt="12" mandatory="y" />
+			<column name="width" type="integer" jt="4" mandatory="y" />
+			<column name="height" type="integer" jt="4" mandatory="y" />
+			<column name="duration" type="integer" jt="4" mandatory="y" />
+			<column name="thumbnail" type="integer" jt="4" />
+			<column name="mime_type" type="text" jt="12" />
+			<column name="file_size" type="integer" jt="4" />
+			<column name="file" type="text" jt="12" />
+			<index name="pk_object_video" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<index name="idx_object_video" unique="NORMAL" >
+				<column name="thumbnail" />
+			</index>
+			<fk name="fk_object_video_object" to_schema="telegram" to_table="object" >
+				<fk_column name="id" pk="id" />
+			</fk>
+			<fk name="fk_object_video_thumbnail" to_schema="telegram" to_table="object_photo" >
+				<fk_column name="thumbnail" pk="id" />
+			</fk>
+		</table>
+		<table name="object_voice" >
+			<column name="id" type="integer" jt="4" mandatory="y" />
+			<column name="voice" type="text" jt="12" mandatory="y" />
+			<column name="duration" type="integer" jt="4" mandatory="y" />
+			<column name="mime_type" type="text" jt="12" />
+			<column name="file_size" type="integer" jt="4" />
+			<column name="file" type="text" jt="12" />
+			<index name="pk_object_voice" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+			<fk name="fk_object_voice_object" to_schema="telegram" to_table="object" >
+				<fk_column name="id" pk="id" />
+			</fk>
+		</table>
+		<table name="user" >
+			<column name="id" type="integer" jt="4" mandatory="y" />
+			<column name="first_name" type="text" length="100" jt="12" mandatory="y" />
+			<column name="last_name" type="text" length="100" jt="12" />
+			<column name="username" type="text" length="100" jt="12" />
+			<index name="pk_user" unique="PRIMARY_KEY" >
+				<column name="id" />
+			</index>
+		</table>
+	</schema>
+	<layout id="Layout_397c103" name="Telegram" show_relation_columns="y" >
+		<entity schema="telegram" name="user" color="c0d4f3" x="855" y="105" />
+		<entity schema="telegram" name="message" color="c0d4f3" x="855" y="270" />
+		<entity schema="telegram" name="chat" color="c0d4f3" x="360" y="60" />
+		<entity schema="telegram" name="chat_type" color="c0d4f3" x="150" y="45" />
+		<entity schema="telegram" name="object_type" color="c0d4f3" x="150" y="150" />
+		<entity schema="telegram" name="object" color="c0d4f3" x="45" y="315" />
+		<entity schema="telegram" name="object_text" color="c0d4f3" x="765" y="405" />
+		<entity schema="telegram" name="contact" color="c0d4f3" x="600" y="150" />
+		<entity schema="telegram" name="object_audio" color="c0d4f3" x="645" y="435" />
+		<entity schema="telegram" name="object_video" color="c0d4f3" x="525" y="465" />
+		<entity schema="telegram" name="object_document" color="c0d4f3" x="390" y="495" />
+		<entity schema="telegram" name="object_sticker" color="c0d4f3" x="270" y="525" />
+		<entity schema="telegram" name="object_voice" color="c0d4f3" x="135" y="555" />
+		<entity schema="telegram" name="object_photo" color="c0d4f3" x="345" y="735" />
+	</layout>
+</project>
