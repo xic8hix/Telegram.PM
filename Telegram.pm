@@ -11,6 +11,7 @@ $VERSION = 0.02;
 $AUTHOR = 'Lev ICHI Zaplatin';
 $AUTHOR_EMAIL = 'dev@ichi.su';
 
+
 #@returns Telegram
 sub new {
     my $class = shift();
@@ -18,7 +19,7 @@ sub new {
     my $callback = shift();
     my $certificate = shift();
     my $self = {
-        _version => $VERSION,
+        version => $VERSION,
         token => $token,
         callback => $callback,
         api_url_base => 'https://api.telegram.org/bot',
@@ -26,6 +27,8 @@ sub new {
         certificate => $certificate,
         user_agent => 'ICHI/Telegram.pm '.$VERSION.'/ru',
         content_type => 'multipart/form-data',
+        storage => 'hash',
+        storage_type => ['hash', 'file', 'SQLite', 'PostgreSQL', 'MySQL'],
         me => {},
     };
     bless($self,$class);
